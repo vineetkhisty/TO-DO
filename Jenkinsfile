@@ -8,22 +8,25 @@ pipeline {
         }
         stage("Build and Test"){
             steps{
-                sh "docker build . -t node-app-test-new"
+             app = bat "docker build . -t node-app-test-new"
             }
         }
-        stage("Push to Docker Hub"){
+        stage("Push to Image to ECR"){
             steps{
-                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"Vineet@1990",usernameVariable:"vineetk2008")]){
-                sh "docker tag node-app-test-new ${env.dockerHubUser}/node-app-test-new:latest"
-                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker push ${env.dockerHubUser}/node-app-test-new:latest"
+//                 withCredentials([usernamePassword(credentialsId:"193bfa88-a70d-4319-96a5-b1a13b098adf",passwordVariable:"devopsengineeranshu1234$",usernameVariable:"anshude1056@gmail.com")]){
+//                 bat "docker tag node-app-test-new ${env.dockerHubUser}/node-app-test-new:latest"
+//                 bat "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+//                 bat "docker push ${env.dockerHubUser}/node-app-test-new:latest"
+                 docker.withRegistry('https://434433864791.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:193bfa88-a70d-4319-96a5-b1a13b098adf') {
+                  app.push("${env.BUILD_NUMBER}")
+                  app.push("latest")
                 }
             }
         }
-        stage("Deploy"){
-            steps{
-                sh "docker-compose down && docker-compose up -d"
-            }
-        }
+//         stage("Deploy"){
+//             steps{
+//                 sh "docker-compose down && docker-compose up -d"
+//             }
+//         }
     }
 }
